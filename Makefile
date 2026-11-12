@@ -15,7 +15,7 @@ test:
 	uv run pytest -q
 
 data:     ## скачать IEEE-CIS и собрать data/raw.parquet
-	@echo "TODO: phase 0 / p0_data"
+	uv run python scripts/download_data.py
 
 train:    ## обучить, откалибровать, зарегистрировать в MLflow
 	@echo "TODO: phase 1"
