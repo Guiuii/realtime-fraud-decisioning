@@ -2,11 +2,15 @@
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 N_TRANSACTIONS = 590_540  # rows in train_transaction.csv
 
 SECONDS_PER_DAY = 86_400
+
+TRAIN_END_DAY = 120  # days 1-120 -> train
+VALID_END_DAY = 150  # days 121-150 -> valid, 151-182 -> test
 
 
 def _floats_to_float32(df: pd.DataFrame) -> pd.DataFrame:
@@ -65,3 +69,14 @@ def make_uid(df: pd.DataFrame) -> pd.Series:
         + open_day.astype("string")
     )
     return uid.rename("uid")
+
+
+def time_split(df: pd.DataFrame) -> pd.Series:
+    """Label each row train / valid / test by transaction day. No shuffling."""
+    day = df["TransactionDT"] // SECONDS_PER_DAY
+    part = pd.cut(
+        day,
+        bins=[-np.inf, TRAIN_END_DAY, VALID_END_DAY, np.inf],
+        labels=["train", "valid", "test"],
+    )
+    return part.rename("part")

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from fraud.data import SECONDS_PER_DAY, make_uid
+from fraud.data import SECONDS_PER_DAY, make_uid, time_split
 
 DAY = SECONDS_PER_DAY
 
@@ -37,3 +37,20 @@ def test_missing_component_gives_missing_uid():
         ]
     )
     assert make_uid(df).isna().tolist() == [True, True, False]
+
+
+def test_time_split_boundaries():
+    days = [1, 120, 121, 150, 151, 182]
+    df = pd.DataFrame(
+        {"TransactionDT": [d * DAY + DAY - 1 for d in days]}
+    )  # last second of each day
+    assert time_split(df).tolist() == ["train", "train", "valid", "valid", "test", "test"]
+
+
+def test_time_split_parts_do_not_overlap_in_time():
+    rng = np.random.default_rng(0)
+    df = pd.DataFrame({"TransactionDT": rng.integers(DAY, 183 * DAY, size=1_000)})
+    part = time_split(df)
+    ts = df["TransactionDT"]
+    assert ts[part == "train"].max() < ts[part == "valid"].min()
+    assert ts[part == "valid"].max() < ts[part == "test"].min()
