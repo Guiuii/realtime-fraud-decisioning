@@ -1,0 +1,10 @@
+# Velocity features. Offline (pandas) and online (Redis) must use the same values.
+# Every window is [t - w, t): the current transaction is excluded.
+
+uid_windows:        # feature suffix -> pandas offset
+  1h: 1h
+  24h: 24h
+  7d: 7D
+
+small_amount: 10.0  # USD; EDA: payments under $10 have ~2.2x the average fraud rate
+median_window: 30D  # baseline for "amount vs the card's usual amount"

@@ -661,6 +661,7 @@ source = { editable = "." }
 dependencies = [
     { name = "pandas" },
     { name = "pyarrow" },
+    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -680,6 +681,7 @@ dev = [
 requires-dist = [
     { name = "pandas", specifier = ">=3.1.1" },
     { name = "pyarrow", specifier = ">=26.0.1" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
 ]
 
 [package.metadata.requires-dev]
