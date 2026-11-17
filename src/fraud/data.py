@@ -6,6 +6,8 @@ import pandas as pd
 
 N_TRANSACTIONS = 590_540  # rows in train_transaction.csv
 
+SECONDS_PER_DAY = 86_400
+
 
 def _floats_to_float32(df: pd.DataFrame) -> pd.DataFrame:
     float_cols = df.select_dtypes("float64").columns
@@ -43,3 +45,23 @@ def build_raw(transaction_csv: Path, identity_csv: Path) -> pd.DataFrame:
 
     df = df.sort_values("TransactionDT", kind="stable", ignore_index=True)
     return reduce_memory(df)
+
+
+def make_uid(df: pd.DataFrame) -> pd.Series:
+    """Card id heuristic: card1 + addr1 + the day the card relationship started.
+
+    D1 is the number of days since the relationship started, so day - D1 is
+    constant for one card. This is a heuristic from IEEE-CIS winning solutions,
+    not a true card id. A missing addr1 or D1 gives a missing uid.
+    """
+    day = df["TransactionDT"] // SECONDS_PER_DAY
+    open_day = (day - df["D1"]).astype("Int64")
+    addr1 = df["addr1"].astype("Int64")
+    uid = (
+        df["card1"].astype("string")
+        + "_"
+        + addr1.astype("string")
+        + "_"
+        + open_day.astype("string")
+    )
+    return uid.rename("uid")

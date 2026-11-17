@@ -22,6 +22,9 @@ flowchart LR
 ## Data
 [IEEE-CIS Fraud Detection](https://www.kaggle.com/c/ieee-fraud-detection) (Kaggle): ~590k card-not-present transactions, ~3.5% fraud. The data is not redistributed here; `scripts/download_data.sh` fetches it via the Kaggle API after you accept the competition rules.
 
+## Data notes
+**Card id (`uid`) is a heuristic**: `card1 + addr1 + (day − D1)`, where `D1` is days since the card relationship started. Two cards with the same `card1`, billing address and start day are merged. Transactions with missing `addr1` or `D1` (11%) have no uid.
+
 ## Approach
 - **Time-based split:** train on days 0–120, validate on 121–150, test on 151–182. No random split.
 - **Velocity features from the past only:** count / sum per card and device over 1 h · 24 h · 7 d, amount vs the card's usual amount, new device, cards per device. The same definitions run offline and online, and a parity test checks they match.
@@ -32,7 +35,7 @@ flowchart LR
 - **Analyst copilot:** for `review` cases, SHAP drivers are mapped to plain-language signals (e.g. *6 transactions in 1 h*, *new device*). Hybrid retrieval (BM25 + embeddings + re-ranker) over fraud-typology notes and public fraud and chargeback documents finds the matching pattern (card testing, account takeover, BIN attack…). A structured case note follows, with citations checked in code. If nothing matches, the copilot says `no_match` instead of guessing.
 
 ## Milestones
-- [ ] Data download, EDA, time-based split
+- [x] Data download, EDA, time-based split
 - [ ] Velocity features + no-future-leak test
 - [ ] Baselines (rules, logistic regression) and CatBoost tracked in MLflow
 - [ ] Calibration and cost-based thresholds
