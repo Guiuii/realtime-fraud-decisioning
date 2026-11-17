@@ -36,7 +36,7 @@ flowchart LR
 
 ## Milestones
 - [x] Data download, EDA, time-based split
-- [ ] Velocity features + no-future-leak test
+- [X] Velocity features + no-future-leak test
 - [ ] Baselines (rules, logistic regression) and CatBoost tracked in MLflow
 - [ ] Calibration and cost-based thresholds
 - [ ] Redis online features + offline/online parity test
